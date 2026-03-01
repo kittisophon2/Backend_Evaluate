@@ -19,6 +19,7 @@ router.get('/users/:id', users.get);
 router.patch('/users/:id', users.update);
 router.delete('/users/:id', users.remove);
 
+
 // Topics & Indicators
 router.get('/topics', topics.list);
 router.post('/topics', topics.create);
@@ -40,5 +41,6 @@ router.get('/assignments', assignments.list);
 router.post('/assignments', assignments.create);
 router.patch('/assignments/:id', assignments.update);
 router.delete('/assignments/:id', assignments.remove);
+
 
 export default router;
