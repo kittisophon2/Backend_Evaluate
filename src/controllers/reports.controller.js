@@ -1,0 +1,1 @@
+export const normalized = (req,res) => res.json({}); export const progress = (req,res) => res.json({});

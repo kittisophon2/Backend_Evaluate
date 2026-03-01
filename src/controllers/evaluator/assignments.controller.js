@@ -1,0 +1,1 @@
+export const list = (req,res) => res.json({}); export const detail = (req,res) => res.json({});

@@ -1,0 +1,1 @@
+export const myEvaluation = (req,res) => res.json({});

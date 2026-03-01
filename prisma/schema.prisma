@@ -1,0 +1,123 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Department {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+
+  users User[]
+}
+
+model User {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  empId        String   @unique
+  name         String
+  departmentId String   @db.ObjectId
+  role         String
+  email        String   @unique
+  password     String
+  createdAt    DateTime @default(now())
+
+  department Department @relation(fields: [departmentId], references: [id])
+
+  createdEvaluations Evaluation[] @relation("EvaluationCreator")
+  createdTopics      Topic[]      @relation("TopicCreator")
+
+  evaluatorAssignments Assignment[] @relation("Evaluator")
+  evaluateeAssignments Assignment[] @relation("Evaluatee")
+
+  evidences IndicatorEvidence[]
+}
+
+model Evaluation {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  createdBy String   @db.ObjectId
+  createdAt DateTime @default(now())
+
+  creator User @relation("EvaluationCreator", fields: [createdBy], references: [id])
+
+  topics      Topic[]
+  assignments Assignment[]
+}
+
+model Topic {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  evaluationId String   @db.ObjectId
+  name         String
+  description  String
+  createdBy    String   @db.ObjectId
+  createdAt    DateTime @default(now())
+
+  evaluation Evaluation @relation(fields: [evaluationId], references: [id])
+  creator    User       @relation("TopicCreator", fields: [createdBy], references: [id])
+
+  indicators Indicator[]
+}
+
+model Indicator {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  topicId         String   @db.ObjectId
+  name            String
+  description     String
+  indicatorType   String
+  requireEvidence Boolean
+  weight          Float
+  createdAt       DateTime @default(now())
+
+  topic Topic @relation(fields: [topicId], references: [id])
+
+  results   IndicatorResult[]
+  evidences IndicatorEvidence[]
+}
+
+model Assignment {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  evaluationId String   @db.ObjectId
+  evaluatorId  String   @db.ObjectId
+  evaluateeId  String   @db.ObjectId
+  createdAt    DateTime @default(now())
+
+  evaluation Evaluation @relation(fields: [evaluationId], references: [id])
+
+  evaluator User @relation("Evaluator", fields: [evaluatorId], references: [id])
+  evaluatee User @relation("Evaluatee", fields: [evaluateeId], references: [id])
+
+  indicatorResults IndicatorResult[]
+}
+
+model IndicatorResult {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  indicatorId  String   @db.ObjectId
+  assignmentId String   @db.ObjectId
+  score        Int
+  createdAt    DateTime @default(now())
+
+  indicator  Indicator  @relation(fields: [indicatorId], references: [id])
+  assignment Assignment @relation(fields: [assignmentId], references: [id])
+}
+
+model IndicatorEvidence {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  indicatorId String   @db.ObjectId
+  evaluateeId String   @db.ObjectId
+  filename    String
+  createdAt   DateTime @default(now())
+
+  indicator Indicator @relation(fields: [indicatorId], references: [id])
+  evaluatee User      @relation(fields: [evaluateeId], references: [id])
+}

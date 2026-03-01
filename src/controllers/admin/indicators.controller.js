@@ -1,0 +1,1 @@
+export const create = (req,res) => res.json({}); export const update = (req,res) => res.json({}); export const remove = (req,res) => res.json({});

@@ -1,0 +1,1 @@
+export const upload = (req,res) => res.json({}); export const list = (req,res) => res.json({}); export const remove = (req,res) => res.json({});
