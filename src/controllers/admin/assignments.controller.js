@@ -8,22 +8,18 @@ export const list = async (req, res, next) => {
         const {
             page = 1,
             pageSize = 10,
-            periodId,
-            departmentId,
+            evaluationId,
             evaluatorId,
-            evaluateeId,
-            status
+            evaluateeId
         } = req.query;
 
         const skip = (Number(page) - 1) * Number(pageSize);
 
         const where = {
             AND: [
-                periodId ? { periodId } : {},
-                departmentId ? { departmentId } : {},
+                evaluationId ? { evaluationId } : {},
                 evaluatorId ? { evaluatorId } : {},
-                evaluateeId ? { evaluateeId } : {},
-                status ? { status } : {}
+                evaluateeId ? { evaluateeId } : {}
             ]
         };
 
@@ -32,7 +28,11 @@ export const list = async (req, res, next) => {
                 where,
                 skip,
                 take: Number(pageSize),
-                orderBy: { createdAt: 'desc' }
+                include: {
+                    evaluation: { select: { name: true } },
+                    evaluator: { select: { name: true, email: true } },
+                    evaluatee: { select: { name: true, email: true } }
+                }
             }),
             prisma.assignment.count({ where })
         ]);
@@ -49,50 +49,27 @@ export const list = async (req, res, next) => {
 //
 export const create = async (req, res, next) => {
     try {
-        // 1. เพิ่มการรับค่า name มาจาก req.body
-        const { periodId, departmentId, evaluatorId, evaluateeId, name } = req.body;
+        const { evaluationId, evaluatorId, evaluateeId } = req.body;
 
-        // 2. เช็คข้อมูลให้ครอบคลุมถึง name
-        if (!periodId || !departmentId || !evaluatorId || !evaluateeId || !name) {
+        if (!evaluationId || !evaluatorId || !evaluateeId) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
-        // 3. ดึงข้อมูล Period เพื่อเอา startDate/endDate
-        const period = await prisma.period.findUnique({ where: { id: periodId } });
-        if (!period) {
-            return res.status(404).json({ message: 'Period not found' });
+        const evaluation = await prisma.evaluation.findUnique({ where: { id: evaluationId } });
+        if (!evaluation) {
+            return res.status(404).json({ message: 'Evaluation not found' });
         }
 
-        // ใช้ transaction เพื่อสร้างข้อมูล
-        const result = await prisma.$transaction(async (tx) => {
-
-            // 4. สร้าง Evaluation ก่อน เพราะใน Schema Assignment อ้างอิงถึง Evaluation
-            const evaluation = await tx.evaluation.create({
-                data: {
-                    name: name,
-                    startDate: period.startDate || new Date(),
-                    endDate: period.endDate || new Date(),
-                    createdBy: req.user.id // ดึงจาก auth middleware
-                }
-            });
-
-            // 5. สร้าง Assignment โดยเชื่อมกับ evaluation.id ที่เพิ่งสร้าง
-            const assignment = await tx.assignment.create({
-                data: {
-                    periodId,
-                    departmentId,
-                    evaluatorId,
-                    evaluateeId,
-                    evaluationId: evaluation.id
-                }
-            });
-
-            return { assignment, evaluation };
+        const assignment = await prisma.assignment.create({
+            data: {
+                evaluationId,
+                evaluatorId,
+                evaluateeId
+            }
         });
 
-        res.status(201).json(result);
+        res.status(201).json(assignment);
     } catch (err) {
-        // duplicate assignment
         if (err.code === 'P2002') {
             return res.status(409).json({ message: 'Duplicate assignment' });
         }
@@ -106,7 +83,7 @@ export const create = async (req, res, next) => {
 export const update = async (req, res, next) => {
     try {
         const id = req.params.id;
-        const { status } = req.body;
+        const { evaluatorId, evaluateeId } = req.body;
 
         const assignment = await prisma.assignment.findUnique({ where: { id } });
         if (!assignment) {
@@ -115,11 +92,17 @@ export const update = async (req, res, next) => {
 
         const updated = await prisma.assignment.update({
             where: { id },
-            data: { status }
+            data: {
+                evaluatorId: evaluatorId || undefined,
+                evaluateeId: evaluateeId || undefined
+            }
         });
 
         res.json(updated);
     } catch (err) {
+        if (err.code === 'P2002') {
+            return res.status(409).json({ message: 'Duplicate assignment' });
+        }
         next(err);
     }
 };
