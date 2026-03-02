@@ -9,7 +9,7 @@ export const list = async (req, res, next) => {
             q = '',
             page = 1,
             pageSize = 10,
-            sort = 'createdAt:asc',
+            sort = 'name:asc',
             evaluationId
         } = req.query;
 
@@ -47,9 +47,9 @@ export const list = async (req, res, next) => {
 //
 export const create = async (req, res, next) => {
     try {
-        const { evaluationId, name, description } = req.body;
+        const { evaluationId, name } = req.body;
 
-        if (!evaluationId || !name || !description) {
+        if (!evaluationId || !name) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
@@ -61,9 +61,7 @@ export const create = async (req, res, next) => {
         const topic = await prisma.topic.create({
             data: {
                 evaluationId,
-                name,
-                description,
-                createdBy: req.user.id
+                name
             }
         });
 
@@ -79,7 +77,7 @@ export const create = async (req, res, next) => {
 export const update = async (req, res, next) => {
     try {
         const id = req.params.id;
-        const { name, description } = req.body;
+        const { name } = req.body;
 
         const topic = await prisma.topic.findUnique({ where: { id } });
         if (!topic) {
@@ -89,8 +87,7 @@ export const update = async (req, res, next) => {
         const updated = await prisma.topic.update({
             where: { id },
             data: {
-                name,
-                description
+                name
             }
         });
 

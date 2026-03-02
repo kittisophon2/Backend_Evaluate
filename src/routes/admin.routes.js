@@ -19,7 +19,6 @@ router.get('/users/:id', users.get);
 router.patch('/users/:id', users.update);
 router.delete('/users/:id', users.remove);
 
-
 // Topics & Indicators
 router.get('/topics', topics.list);
 router.post('/topics', topics.create);
