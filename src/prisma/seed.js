@@ -7,7 +7,7 @@ dotenv.config();
 const prisma = new PrismaClient();
 
 async function main() {
-    const password = await bcrypt.hash('password123', 10);
+    const passwordHash = await bcrypt.hash('password123', 10);
 
     let dept = await prisma.department.findFirst({
         where: { name: 'Information Technology' }
@@ -21,12 +21,11 @@ async function main() {
 
     await prisma.user.upsert({
         where: { email: 'admin@test.com' },
-        update: {},
+        update: { passwordHash: passwordHash },
         create: {
             email: 'admin@test.com',
-            empId: 'ADM001',
             name: 'Admin',
-            password: password,
+            passwordHash: passwordHash,
             role: 'ADMIN',
             departmentId: dept.id
         }
@@ -34,12 +33,11 @@ async function main() {
 
     await prisma.user.upsert({
         where: { email: 'eva@test.com' },
-        update: {},
+        update: { passwordHash: passwordHash },
         create: {
             email: 'eva@test.com',
-            empId: 'EVAL001',
             name: 'Evaluator',
-            password: password,
+            passwordHash: passwordHash,
             role: 'EVALUATOR',
             departmentId: dept.id
         }
@@ -47,16 +45,55 @@ async function main() {
 
     await prisma.user.upsert({
         where: { email: 'tee@test.com' },
-        update: {},
+        update: { passwordHash: passwordHash },
         create: {
             email: 'tee@test.com',
-            empId: 'TEE001',
             name: 'Evaluatee',
-            password: password,
+            passwordHash: passwordHash,
             role: 'EVALUATEE',
             departmentId: dept.id
         }
     });
+
+    let evaluation = await prisma.evaluation.findFirst({
+        where: { name: 'Sample Evaluation' }
+    });
+
+    if (!evaluation) {
+        evaluation = await prisma.evaluation.create({
+            data: {
+                name: 'Sample Evaluation',
+                startAt: new Date(),
+                endAt: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+                status: 'OPEN',
+                topics: {
+                    create: [
+                        {
+                            name: 'Topic 1: Technical Skills',
+                            indicators: {
+                                create: [
+                                    { name: 'Indicator 1.1: Code Quality', type: 'SCALE_1_4', weight: 0.5, requireEvidence: true },
+                                    { name: 'Indicator 1.2: Problem Solving', type: 'SCALE_1_4', weight: 0.5, requireEvidence: false }
+                                ]
+                            }
+                        },
+                        {
+                            name: 'Topic 2: Soft Skills',
+                            indicators: {
+                                create: [
+                                    { name: 'Indicator 2.1: Communication', type: 'SCALE_1_4', weight: 0.5, requireEvidence: false },
+                                    { name: 'Indicator 2.2: Teamwork', type: 'YES_NO', weight: 0.5, requireEvidence: false }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        });
+        console.log('Created Evaluation with Topics and Indicators');
+    } else {
+        console.log('Sample Evaluation already exists');
+    }
 }
 
 main()

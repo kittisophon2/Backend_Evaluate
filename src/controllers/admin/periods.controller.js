@@ -5,7 +5,7 @@ import prisma from '../../prisma/client.js';
 //
 export const list = async (req, res, next) => {
     try {
-        const { q = '', page = 1, pageSize = 10, sort = 'startDate:desc', status } = req.query;
+        const { q = '', page = 1, pageSize = 10, sort = 'startAt:desc', status } = req.query;
         const [sortField, sortOrder] = sort.split(':');
         const skip = (Number(page) - 1) * Number(pageSize);
 
@@ -17,13 +17,13 @@ export const list = async (req, res, next) => {
         };
 
         const [data, total] = await Promise.all([
-            prisma.period.findMany({
+            prisma.evaluation.findMany({
                 where,
                 skip,
                 take: Number(pageSize),
                 orderBy: { [sortField]: sortOrder }
             }),
-            prisma.period.count({ where })
+            prisma.evaluation.count({ where })
         ]);
 
         res.json({ data, meta: { total, page: Number(page), pageSize: Number(pageSize) } });
@@ -37,20 +37,21 @@ export const list = async (req, res, next) => {
 //
 export const create = async (req, res, next) => {
     try {
-        const { name, startDate, endDate } = req.body;
-        if (!name || !startDate || !endDate) {
+        const { name, startAt, endAt, status = 'DRAFT' } = req.body;
+        if (!name || !startAt || !endAt) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
-        const period = await prisma.period.create({
+        const evaluation = await prisma.evaluation.create({
             data: {
                 name,
-                startDate: new Date(startDate),
-                endDate: new Date(endDate)
+                startAt: new Date(startAt),
+                endAt: new Date(endAt),
+                status
             }
         });
 
-        res.status(201).json(period);
+        res.status(201).json(evaluation);
     } catch (err) {
         next(err);
     }
@@ -61,18 +62,18 @@ export const create = async (req, res, next) => {
 //
 export const update = async (req, res, next) => {
     try {
-        const id = Number(req.params.id);
-        const { name, startDate, endDate, status } = req.body;
+        const id = req.params.id;
+        const { name, startAt, endAt, status } = req.body;
 
-        const period = await prisma.period.findUnique({ where: { id } });
-        if (!period) return res.status(404).json({ message: 'Period not found' });
+        const evaluation = await prisma.evaluation.findUnique({ where: { id } });
+        if (!evaluation) return res.status(404).json({ message: 'Evaluation not found' });
 
-        const updated = await prisma.period.update({
+        const updated = await prisma.evaluation.update({
             where: { id },
             data: {
                 name,
-                startDate: startDate ? new Date(startDate) : undefined,
-                endDate: endDate ? new Date(endDate) : undefined,
+                startAt: startAt ? new Date(startAt) : undefined,
+                endAt: endAt ? new Date(endAt) : undefined,
                 status
             }
         });
@@ -88,27 +89,21 @@ export const update = async (req, res, next) => {
 //
 export const close = async (req, res, next) => {
     try {
-        const id = Number(req.params.id);
+        const id = req.params.id;
 
-        const period = await prisma.period.findUnique({ where: { id } });
-        if (!period) return res.status(404).json({ message: 'Period not found' });
+        const evaluation = await prisma.evaluation.findUnique({ where: { id } });
+        if (!evaluation) return res.status(404).json({ message: 'Evaluation not found' });
 
-        if (period.status === 'CLOSED') {
-            return res.status(400).json({ message: 'Period already closed' });
+        if (evaluation.status === 'CLOSED') {
+            return res.status(400).json({ message: 'Evaluation already closed' });
         }
 
-        await prisma.$transaction([
-            prisma.period.update({
-                where: { id },
-                data: { status: 'CLOSED' }
-            }),
-            prisma.evaluation.updateMany({
-                where: { periodId: id },
-                data: { status: 'LOCKED', lockedAt: new Date() }
-            })
-        ]);
+        await prisma.evaluation.update({
+            where: { id },
+            data: { status: 'CLOSED' }
+        });
 
-        res.json({ message: 'Period closed and evaluations locked' });
+        res.json({ message: 'Evaluation period closed successfully' });
     } catch (err) {
         next(err);
     }

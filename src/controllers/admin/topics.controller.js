@@ -10,7 +10,7 @@ export const list = async (req, res, next) => {
             page = 1,
             pageSize = 10,
             sort = 'createdAt:asc',
-            isActive
+            evaluationId
         } = req.query;
 
         const [sortField, sortOrder] = sort.split(':');
@@ -18,15 +18,8 @@ export const list = async (req, res, next) => {
 
         const where = {
             AND: [
-                q
-                    ? {
-                        OR: [
-                            { name: { contains: q } },
-                            { code: { contains: q } }
-                        ]
-                    }
-                    : {},
-                isActive !== undefined ? { isActive: isActive === 'true' } : {}
+                q ? { name: { contains: q } } : {},
+                evaluationId ? { evaluationId } : {}
             ]
         };
 
@@ -54,19 +47,24 @@ export const list = async (req, res, next) => {
 //
 export const create = async (req, res, next) => {
     try {
-        const { code, name, weight, isActive = true } = req.body;
+        const { evaluationId, name, description } = req.body;
 
-        if (!code || !name || weight === undefined) {
+        if (!evaluationId || !name || !description) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
-        const exists = await prisma.topic.findUnique({ where: { code } });
-        if (exists) {
-            return res.status(409).json({ message: 'Topic code already exists' });
+        const evaluation = await prisma.evaluation.findUnique({ where: { id: evaluationId } });
+        if (!evaluation) {
+            return res.status(404).json({ message: 'Evaluation not found' });
         }
 
         const topic = await prisma.topic.create({
-            data: { code, name, weight: Number(weight), isActive }
+            data: {
+                evaluationId,
+                name,
+                description,
+                createdBy: req.user.id
+            }
         });
 
         res.status(201).json(topic);
@@ -80,8 +78,8 @@ export const create = async (req, res, next) => {
 //
 export const update = async (req, res, next) => {
     try {
-        const id = Number(req.params.id);
-        const { name, weight, isActive } = req.body;
+        const id = req.params.id;
+        const { name, description } = req.body;
 
         const topic = await prisma.topic.findUnique({ where: { id } });
         if (!topic) {
@@ -92,8 +90,7 @@ export const update = async (req, res, next) => {
             where: { id },
             data: {
                 name,
-                weight: weight !== undefined ? Number(weight) : undefined,
-                isActive
+                description
             }
         });
 
@@ -108,16 +105,15 @@ export const update = async (req, res, next) => {
 //
 export const remove = async (req, res, next) => {
     try {
-        const id = Number(req.params.id);
+        const id = req.params.id;
 
         const topic = await prisma.topic.findUnique({ where: { id } });
         if (!topic) {
             return res.status(404).json({ message: 'Topic not found' });
         }
 
-        await prisma.topic.update({
-            where: { id },
-            data: { isActive: false }
+        await prisma.topic.delete({
+            where: { id }
         });
 
         res.status(204).end();

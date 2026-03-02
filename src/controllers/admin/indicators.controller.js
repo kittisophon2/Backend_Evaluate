@@ -5,13 +5,12 @@ import prisma from '../../prisma/client.js';
 //
 export const list = async (req, res, next) => {
     try {
-        const topicId = Number(req.params.topicId);
+        const topicId = req.params.topicId;
         const {
             q = '',
             page = 1,
             pageSize = 10,
-            sort = 'createdAt:asc',
-            isActive
+            sort = 'createdAt:asc'
         } = req.query;
 
         const [sortField, sortOrder] = sort.split(':');
@@ -20,15 +19,7 @@ export const list = async (req, res, next) => {
         const where = {
             AND: [
                 { topicId },
-                q
-                    ? {
-                        OR: [
-                            { title: { contains: q } },
-                            { code: { contains: q } }
-                        ]
-                    }
-                    : {},
-                isActive !== undefined ? { isActive: isActive === 'true' } : {}
+                q ? { name: { contains: q } } : {}
             ]
         };
 
@@ -56,37 +47,35 @@ export const list = async (req, res, next) => {
 //
 export const create = async (req, res, next) => {
     try {
-        const topicId = Number(req.params.topicId);
+        const topicId = req.params.topicId;
         const {
-            code,
-            title,
-            type,
-            weight,
-            evidenceRequiredWhenYes = false,
-            isActive = true
+            name,
+            description,
+            indicatorType,
+            requireEvidence = false,
+            weight
         } = req.body;
 
-        if (!code || !title || !type || weight === undefined) {
+        if (!name || !description || !indicatorType || weight === undefined) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
-        const exists = await prisma.indicator.findFirst({
-            where: { topicId, code }
+        const topicExists = await prisma.topic.findUnique({
+            where: { id: topicId }
         });
 
-        if (exists) {
-            return res.status(409).json({ message: 'Indicator code already exists in this topic' });
+        if (!topicExists) {
+            return res.status(404).json({ message: 'Topic not found' });
         }
 
         const indicator = await prisma.indicator.create({
             data: {
                 topicId,
-                code,
-                title,
-                type,
-                weight: Number(weight),
-                evidenceRequiredWhenYes,
-                isActive
+                name,
+                description,
+                indicatorType,
+                requireEvidence,
+                weight: Number(weight)
             }
         });
 
@@ -101,13 +90,13 @@ export const create = async (req, res, next) => {
 //
 export const update = async (req, res, next) => {
     try {
-        const indicatorId = Number(req.params.indicatorId);
+        const indicatorId = req.params.indicatorId;
         const {
-            title,
-            type,
-            weight,
-            evidenceRequiredWhenYes,
-            isActive
+            name,
+            description,
+            indicatorType,
+            requireEvidence,
+            weight
         } = req.body;
 
         const indicator = await prisma.indicator.findUnique({
@@ -121,11 +110,11 @@ export const update = async (req, res, next) => {
         const updated = await prisma.indicator.update({
             where: { id: indicatorId },
             data: {
-                title,
-                type,
-                weight: weight !== undefined ? Number(weight) : undefined,
-                evidenceRequiredWhenYes,
-                isActive
+                name,
+                description,
+                indicatorType,
+                requireEvidence,
+                weight: weight !== undefined ? Number(weight) : undefined
             }
         });
 
@@ -140,7 +129,7 @@ export const update = async (req, res, next) => {
 //
 export const remove = async (req, res, next) => {
     try {
-        const indicatorId = Number(req.params.indicatorId);
+        const indicatorId = req.params.indicatorId;
 
         const indicator = await prisma.indicator.findUnique({
             where: { id: indicatorId }
@@ -150,9 +139,8 @@ export const remove = async (req, res, next) => {
             return res.status(404).json({ message: 'Indicator not found' });
         }
 
-        await prisma.indicator.update({
-            where: { id: indicatorId },
-            data: { isActive: false }
+        await prisma.indicator.delete({
+            where: { id: indicatorId }
         });
 
         res.status(204).end();

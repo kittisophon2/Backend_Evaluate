@@ -13,8 +13,7 @@ export const list = async (req, res, next) => {
             pageSize = 10,
             sort = 'createdAt:desc',
             role,
-            departmentId,
-            isActive
+            departmentId
         } = req.query;
 
         const [sortField, sortOrder] = sort.split(':');
@@ -30,8 +29,7 @@ export const list = async (req, res, next) => {
                     }
                     : {},
                 role ? { role } : {},
-                departmentId ? { departmentId: Number(departmentId) } : {},
-                isActive !== undefined ? { isActive: isActive === 'true' } : {}
+                departmentId ? { departmentId } : {}
             ]
         };
 
@@ -49,7 +47,6 @@ export const list = async (req, res, next) => {
                     name: true,
                     role: true,
                     departmentId: true,
-                    isActive: true,
                     createdAt: true
                 }
             }),
@@ -94,7 +91,7 @@ export const create = async (req, res, next) => {
                 name,
                 passwordHash,
                 role,
-                departmentId: departmentId ? Number(departmentId) : null
+                departmentId: departmentId || null
             },
             select: {
                 id: true,
@@ -102,7 +99,6 @@ export const create = async (req, res, next) => {
                 name: true,
                 role: true,
                 departmentId: true,
-                isActive: true,
                 createdAt: true
             }
         });
@@ -118,7 +114,7 @@ export const create = async (req, res, next) => {
 //
 export const get = async (req, res, next) => {
     try {
-        const id = Number(req.params.id);
+        const id = req.params.id;
 
         const user = await prisma.user.findUnique({
             where: { id },
@@ -128,7 +124,6 @@ export const get = async (req, res, next) => {
                 name: true,
                 role: true,
                 departmentId: true,
-                isActive: true,
                 createdAt: true
             }
         });
@@ -149,8 +144,8 @@ export const get = async (req, res, next) => {
 //
 export const update = async (req, res, next) => {
     try {
-        const id = Number(req.params.id);
-        const { name, role, departmentId, isActive } = req.body;
+        const id = req.params.id;
+        const { name, role, departmentId } = req.body;
 
         const user = await prisma.user.findUnique({ where: { id } });
         if (!user) {
@@ -162,8 +157,7 @@ export const update = async (req, res, next) => {
             data: {
                 name,
                 role,
-                departmentId: departmentId !== undefined ? Number(departmentId) : undefined,
-                isActive
+                departmentId: departmentId !== undefined ? departmentId : undefined
             },
             select: {
                 id: true,
@@ -171,8 +165,7 @@ export const update = async (req, res, next) => {
                 name: true,
                 role: true,
                 departmentId: true,
-                isActive: true,
-                updatedAt: true
+                createdAt: true // Schema doesn't have updatedAt
             }
         });
 
@@ -184,20 +177,19 @@ export const update = async (req, res, next) => {
 
 //
 // DELETE /admin/users/:id
-// soft delete
+// hard delete since isActive is gone
 //
 export const remove = async (req, res, next) => {
     try {
-        const id = Number(req.params.id);
+        const id = req.params.id;
 
         const user = await prisma.user.findUnique({ where: { id } });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        await prisma.user.update({
-            where: { id },
-            data: { isActive: false }
+        await prisma.user.delete({
+            where: { id }
         });
 
         res.status(204).end();

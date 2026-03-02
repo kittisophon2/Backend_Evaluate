@@ -1,0 +1,1829 @@
+{
+  "collection": {
+    "_": {
+      "postman_id": "1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p"
+    },
+    "item": [
+      {
+        "id": "2be322cd-64e9-4638-b30f-547e86daecf3",
+        "name": "1. Admin Login (Get Token)",
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "4000",
+            "path": [
+              "auth",
+              "login"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"email\": \"admin@test.com\",\n    \"password\": \"password123\"\n}"
+          }
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "38b93567-d832-43d2-aac8-34c166495549",
+              "type": "text/javascript",
+              "exec": [
+                "var jsonData = pm.response.json();",
+                "pm.collectionVariables.set(\"token\", jsonData.token);"
+              ],
+              "_lastExecutionId": "27d6b25f-a31a-4ee3-b581-b69a3be35a31"
+            }
+          }
+        ]
+      },
+      {
+        "id": "b8451e32-4579-48c2-b463-04486c68b655",
+        "name": "2. Get Periods (To Find ID)",
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "4000",
+            "path": [
+              "admin",
+              "periods"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}"
+            }
+          ],
+          "method": "GET"
+        },
+        "response": [],
+        "event": []
+      },
+      {
+        "id": "6c69ce17-bf3f-48d5-9122-5795f3d11b6f",
+        "name": "3. Update Period (PATCH)",
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "4000",
+            "path": [
+              "admin",
+              "periods",
+              ":id"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": [
+              {
+                "type": "any",
+                "value": "69a475e907e359c3d1d32dba",
+                "key": "id"
+              }
+            ]
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Authorization",
+              "value": "Bearer {{token}}"
+            }
+          ],
+          "method": "PATCH",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"name\": \"การประเมินประจำครึ่งปีแรก 2026 (Updated from Postman)\",\n    \"status\": \"OPEN\"\n}"
+          }
+        },
+        "response": [],
+        "event": []
+      }
+    ],
+    "event": [],
+    "variable": [
+      {
+        "type": "any",
+        "value": "",
+        "key": "token"
+      }
+    ],
+    "info": {
+      "_postman_id": "1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p",
+      "name": "Back_Evaluate - Periods API",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    }
+  },
+  "environment": {
+    "id": "48a19b69-cd50-4811-9960-f5852290af79",
+    "values": []
+  },
+  "globals": {
+    "id": "5c2427ff-00ea-43bd-9fe8-af817100e844",
+    "values": []
+  },
+  "run": {
+    "stats": {
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 3,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 3,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 3,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 3,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseAverage": 127.33333333333333,
+      "responseMin": 68,
+      "responseMax": 203,
+      "responseSd": 56.31064631922536,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1772456633855,
+      "completed": 1772456634472
+    },
+    "executions": [
+      {
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 3,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "f9ae68e7-64cf-4aea-88f6-76c6bcdcc316",
+          "httpRequestId": "a19039b2-296b-46e9-84d7-d872a40ee9ba"
+        },
+        "item": {
+          "id": "2be322cd-64e9-4638-b30f-547e86daecf3",
+          "name": "1. Admin Login (Get Token)",
+          "request": {
+            "url": {
+              "protocol": "http",
+              "port": "4000",
+              "path": [
+                "auth",
+                "login"
+              ],
+              "host": [
+                "localhost"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@test.com\",\n    \"password\": \"password123\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "38b93567-d832-43d2-aac8-34c166495549",
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set(\"token\", jsonData.token);"
+                ],
+                "_lastExecutionId": "27d6b25f-a31a-4ee3-b581-b69a3be35a31"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "4000",
+            "path": [
+              "auth",
+              "login"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "f5cb6f4e-b3fd-4d20-bc6c-83cef9d7d562",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:4000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "64",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"email\": \"admin@test.com\",\n    \"password\": \"password123\"\n}"
+          }
+        },
+        "response": {
+          "id": "93f54f8c-f6fd-4d3e-b542-34b2647ce65c",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Security-Policy",
+              "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+            },
+            {
+              "key": "Cross-Origin-Opener-Policy",
+              "value": "same-origin"
+            },
+            {
+              "key": "Cross-Origin-Resource-Policy",
+              "value": "same-origin"
+            },
+            {
+              "key": "Origin-Agent-Cluster",
+              "value": "?1"
+            },
+            {
+              "key": "Referrer-Policy",
+              "value": "no-referrer"
+            },
+            {
+              "key": "Strict-Transport-Security",
+              "value": "max-age=31536000; includeSubDomains"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "X-DNS-Prefetch-Control",
+              "value": "off"
+            },
+            {
+              "key": "X-Download-Options",
+              "value": "noopen"
+            },
+            {
+              "key": "X-Frame-Options",
+              "value": "SAMEORIGIN"
+            },
+            {
+              "key": "X-Permitted-Cross-Domain-Policies",
+              "value": "none"
+            },
+            {
+              "key": "X-XSS-Protection",
+              "value": "0"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "321"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"141-4LCKf58MVnNO5k32JC82iOfZKEk\""
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 02 Mar 2026 13:03:53 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              116,
+              111,
+              107,
+              101,
+              110,
+              34,
+              58,
+              34,
+              101,
+              121,
+              74,
+              104,
+              98,
+              71,
+              99,
+              105,
+              79,
+              105,
+              74,
+              73,
+              85,
+              122,
+              73,
+              49,
+              78,
+              105,
+              73,
+              115,
+              73,
+              110,
+              82,
+              53,
+              99,
+              67,
+              73,
+              54,
+              73,
+              107,
+              112,
+              88,
+              86,
+              67,
+              74,
+              57,
+              46,
+              101,
+              121,
+              74,
+              49,
+              99,
+              50,
+              86,
+              121,
+              83,
+              87,
+              81,
+              105,
+              79,
+              105,
+              73,
+              50,
+              79,
+              87,
+              69,
+              48,
+              78,
+              109,
+              70,
+              107,
+              89,
+              109,
+              70,
+              105,
+              90,
+              109,
+              81,
+              48,
+              89,
+              122,
+              65,
+              48,
+              90,
+              109,
+              73,
+              121,
+              90,
+              84,
+              99,
+              52,
+              78,
+              106,
+              85,
+              105,
+              76,
+              67,
+              74,
+              121,
+              98,
+              50,
+              120,
+              108,
+              73,
+              106,
+              111,
+              105,
+              81,
+              85,
+              82,
+              78,
+              83,
+              85,
+              52,
+              105,
+              76,
+              67,
+              74,
+              112,
+              89,
+              88,
+              81,
+              105,
+              79,
+              106,
+              69,
+              51,
+              78,
+              122,
+              73,
+              48,
+              78,
+              84,
+              89,
+              50,
+              77,
+              122,
+              77,
+              115,
+              73,
+              109,
+              86,
+              52,
+              99,
+              67,
+              73,
+              54,
+              77,
+              84,
+              99,
+              51,
+              77,
+              106,
+              81,
+              52,
+              78,
+              84,
+              81,
+              122,
+              77,
+              51,
+              48,
+              46,
+              108,
+              79,
+              50,
+              72,
+              95,
+              80,
+              100,
+              74,
+              70,
+              77,
+              103,
+              82,
+              85,
+              56,
+              70,
+              107,
+              65,
+              84,
+              52,
+              57,
+              104,
+              76,
+              86,
+              88,
+              48,
+              80,
+              45,
+              86,
+              49,
+              84,
+              74,
+              83,
+              87,
+              75,
+              67,
+              116,
+              89,
+              119,
+              65,
+              70,
+              56,
+              104,
+              52,
+              34,
+              44,
+              34,
+              117,
+              115,
+              101,
+              114,
+              34,
+              58,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              54,
+              57,
+              97,
+              52,
+              54,
+              97,
+              100,
+              98,
+              97,
+              98,
+              102,
+              100,
+              52,
+              99,
+              48,
+              52,
+              102,
+              98,
+              50,
+              101,
+              55,
+              56,
+              54,
+              53,
+              34,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              65,
+              100,
+              109,
+              105,
+              110,
+              34,
+              44,
+              34,
+              114,
+              111,
+              108,
+              101,
+              34,
+              58,
+              34,
+              65,
+              68,
+              77,
+              73,
+              78,
+              34,
+              44,
+              34,
+              100,
+              101,
+              112,
+              97,
+              114,
+              116,
+              109,
+              101,
+              110,
+              116,
+              73,
+              100,
+              34,
+              58,
+              34,
+              54,
+              57,
+              97,
+              52,
+              54,
+              97,
+              100,
+              98,
+              97,
+              98,
+              102,
+              100,
+              52,
+              99,
+              48,
+              52,
+              102,
+              98,
+              50,
+              101,
+              55,
+              56,
+              54,
+              52,
+              34,
+              125,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 111,
+          "responseSize": 321
+        },
+        "id": "2be322cd-64e9-4638-b30f-547e86daecf3"
+      },
+      {
+        "cursor": {
+          "ref": "348f33ed-6573-43a5-a9e2-31d4425200d4",
+          "length": 3,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "c37dcada-b0ae-4216-a2be-40f40fedb665"
+        },
+        "item": {
+          "id": "b8451e32-4579-48c2-b463-04486c68b655",
+          "name": "2. Get Periods (To Find ID)",
+          "request": {
+            "url": {
+              "protocol": "http",
+              "port": "4000",
+              "path": [
+                "admin",
+                "periods"
+              ],
+              "host": [
+                "localhost"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": []
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "4000",
+            "path": [
+              "admin",
+              "periods"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWE0NmFkYmFiZmQ0YzA0ZmIyZTc4NjUiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NzI0NTY2MzMsImV4cCI6MTc3MjQ4NTQzM30.lO2H_PdJFMgRU8FkAT49hLVX0P-V1TJSWKCtYwAF8h4"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "cbecd596-f6d9-4906-8bd7-7f6493ada24a",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:4000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "5f14075c-9055-4b02-b14c-bf7d00aa53c7",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Security-Policy",
+              "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+            },
+            {
+              "key": "Cross-Origin-Opener-Policy",
+              "value": "same-origin"
+            },
+            {
+              "key": "Cross-Origin-Resource-Policy",
+              "value": "same-origin"
+            },
+            {
+              "key": "Origin-Agent-Cluster",
+              "value": "?1"
+            },
+            {
+              "key": "Referrer-Policy",
+              "value": "no-referrer"
+            },
+            {
+              "key": "Strict-Transport-Security",
+              "value": "max-age=31536000; includeSubDomains"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "X-DNS-Prefetch-Control",
+              "value": "off"
+            },
+            {
+              "key": "X-Download-Options",
+              "value": "noopen"
+            },
+            {
+              "key": "X-Frame-Options",
+              "value": "SAMEORIGIN"
+            },
+            {
+              "key": "X-Permitted-Cross-Domain-Policies",
+              "value": "none"
+            },
+            {
+              "key": "X-XSS-Protection",
+              "value": "0"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "436"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"1b4-IyoAtPMxb2bU3RFx84oIROBX1I0\""
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 02 Mar 2026 13:03:54 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              100,
+              97,
+              116,
+              97,
+              34,
+              58,
+              91,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              54,
+              57,
+              97,
+              53,
+              56,
+              48,
+              99,
+              97,
+              99,
+              54,
+              55,
+              55,
+              55,
+              57,
+              54,
+              101,
+              52,
+              50,
+              99,
+              101,
+              53,
+              53,
+              51,
+              98,
+              34,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              83,
+              97,
+              109,
+              112,
+              108,
+              101,
+              32,
+              69,
+              118,
+              97,
+              108,
+              117,
+              97,
+              116,
+              105,
+              111,
+              110,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              114,
+              116,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              48,
+              51,
+              45,
+              48,
+              50,
+              84,
+              49,
+              50,
+              58,
+              50,
+              49,
+              58,
+              51,
+              48,
+              46,
+              55,
+              51,
+              49,
+              90,
+              34,
+              44,
+              34,
+              101,
+              110,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              55,
+              45,
+              48,
+              51,
+              45,
+              48,
+              50,
+              84,
+              49,
+              50,
+              58,
+              50,
+              49,
+              58,
+              51,
+              48,
+              46,
+              55,
+              51,
+              49,
+              90,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              34,
+              79,
+              80,
+              69,
+              78,
+              34,
+              125,
+              44,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              54,
+              57,
+              97,
+              52,
+              55,
+              53,
+              101,
+              57,
+              48,
+              55,
+              101,
+              51,
+              53,
+              57,
+              99,
+              51,
+              100,
+              49,
+              100,
+              51,
+              50,
+              100,
+              98,
+              97,
+              34,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              224,
+              184,
+              129,
+              224,
+              184,
+              178,
+              224,
+              184,
+              163,
+              224,
+              184,
+              155,
+              224,
+              184,
+              163,
+              224,
+              184,
+              176,
+              224,
+              185,
+              128,
+              224,
+              184,
+              161,
+              224,
+              184,
+              180,
+              224,
+              184,
+              153,
+              224,
+              184,
+              155,
+              224,
+              184,
+              163,
+              224,
+              184,
+              176,
+              224,
+              184,
+              136,
+              224,
+              184,
+              179,
+              224,
+              184,
+              132,
+              224,
+              184,
+              163,
+              224,
+              184,
+              182,
+              224,
+              185,
+              136,
+              224,
+              184,
+              135,
+              224,
+              184,
+              155,
+              224,
+              184,
+              181,
+              224,
+              185,
+              129,
+              224,
+              184,
+              163,
+              224,
+              184,
+              129,
+              32,
+              50,
+              48,
+              50,
+              54,
+              32,
+              40,
+              85,
+              112,
+              100,
+              97,
+              116,
+              101,
+              100,
+              32,
+              102,
+              114,
+              111,
+              109,
+              32,
+              80,
+              111,
+              115,
+              116,
+              109,
+              97,
+              110,
+              41,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              114,
+              116,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              48,
+              49,
+              45,
+              48,
+              49,
+              84,
+              48,
+              48,
+              58,
+              48,
+              48,
+              58,
+              48,
+              48,
+              46,
+              48,
+              48,
+              48,
+              90,
+              34,
+              44,
+              34,
+              101,
+              110,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              48,
+              54,
+              45,
+              51,
+              48,
+              84,
+              50,
+              51,
+              58,
+              53,
+              57,
+              58,
+              53,
+              57,
+              46,
+              48,
+              48,
+              48,
+              90,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              34,
+              79,
+              80,
+              69,
+              78,
+              34,
+              125,
+              93,
+              44,
+              34,
+              109,
+              101,
+              116,
+              97,
+              34,
+              58,
+              123,
+              34,
+              116,
+              111,
+              116,
+              97,
+              108,
+              34,
+              58,
+              50,
+              44,
+              34,
+              112,
+              97,
+              103,
+              101,
+              34,
+              58,
+              49,
+              44,
+              34,
+              112,
+              97,
+              103,
+              101,
+              83,
+              105,
+              122,
+              101,
+              34,
+              58,
+              49,
+              48,
+              125,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 68,
+          "responseSize": 436
+        },
+        "id": "b8451e32-4579-48c2-b463-04486c68b655"
+      },
+      {
+        "cursor": {
+          "ref": "d12d32b5-bdea-40a7-9c93-fa1c31c89bea",
+          "length": 3,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "092c40a2-2047-4401-918b-888dd705fdd5"
+        },
+        "item": {
+          "id": "6c69ce17-bf3f-48d5-9122-5795f3d11b6f",
+          "name": "3. Update Period (PATCH)",
+          "request": {
+            "url": {
+              "protocol": "http",
+              "port": "4000",
+              "path": [
+                "admin",
+                "periods",
+                ":id"
+              ],
+              "host": [
+                "localhost"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "69a475e907e359c3d1d32dba",
+                  "key": "id"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "method": "PATCH",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"การประเมินประจำครึ่งปีแรก 2026 (Updated from Postman)\",\n    \"status\": \"OPEN\"\n}"
+            }
+          },
+          "response": [],
+          "event": []
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "4000",
+            "path": [
+              "admin",
+              "periods",
+              "69a475e907e359c3d1d32dba"
+            ],
+            "host": [
+              "localhost"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWE0NmFkYmFiZmQ0YzA0ZmIyZTc4NjUiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NzI0NTY2MzMsImV4cCI6MTc3MjQ4NTQzM30.lO2H_PdJFMgRU8FkAT49hLVX0P-V1TJSWKCtYwAF8h4"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "4cf54267-2575-4835-b2a4-d4c46a2b00ac",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "localhost:4000",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "143",
+              "system": true
+            }
+          ],
+          "method": "PATCH",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n    \"name\": \"การประเมินประจำครึ่งปีแรก 2026 (Updated from Postman)\",\n    \"status\": \"OPEN\"\n}"
+          }
+        },
+        "response": {
+          "id": "8fc80f0a-4821-4e29-a77e-e54c2f65d073",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Security-Policy",
+              "value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+            },
+            {
+              "key": "Cross-Origin-Opener-Policy",
+              "value": "same-origin"
+            },
+            {
+              "key": "Cross-Origin-Resource-Policy",
+              "value": "same-origin"
+            },
+            {
+              "key": "Origin-Agent-Cluster",
+              "value": "?1"
+            },
+            {
+              "key": "Referrer-Policy",
+              "value": "no-referrer"
+            },
+            {
+              "key": "Strict-Transport-Security",
+              "value": "max-age=31536000; includeSubDomains"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            },
+            {
+              "key": "X-DNS-Prefetch-Control",
+              "value": "off"
+            },
+            {
+              "key": "X-Download-Options",
+              "value": "noopen"
+            },
+            {
+              "key": "X-Frame-Options",
+              "value": "SAMEORIGIN"
+            },
+            {
+              "key": "X-Permitted-Cross-Domain-Policies",
+              "value": "none"
+            },
+            {
+              "key": "X-XSS-Protection",
+              "value": "0"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "234"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"ea-BDSq74ZEVpAhS+Nu/LfKBL4EN54\""
+            },
+            {
+              "key": "Date",
+              "value": "Mon, 02 Mar 2026 13:03:54 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              54,
+              57,
+              97,
+              52,
+              55,
+              53,
+              101,
+              57,
+              48,
+              55,
+              101,
+              51,
+              53,
+              57,
+              99,
+              51,
+              100,
+              49,
+              100,
+              51,
+              50,
+              100,
+              98,
+              97,
+              34,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              224,
+              184,
+              129,
+              224,
+              184,
+              178,
+              224,
+              184,
+              163,
+              224,
+              184,
+              155,
+              224,
+              184,
+              163,
+              224,
+              184,
+              176,
+              224,
+              185,
+              128,
+              224,
+              184,
+              161,
+              224,
+              184,
+              180,
+              224,
+              184,
+              153,
+              224,
+              184,
+              155,
+              224,
+              184,
+              163,
+              224,
+              184,
+              176,
+              224,
+              184,
+              136,
+              224,
+              184,
+              179,
+              224,
+              184,
+              132,
+              224,
+              184,
+              163,
+              224,
+              184,
+              182,
+              224,
+              185,
+              136,
+              224,
+              184,
+              135,
+              224,
+              184,
+              155,
+              224,
+              184,
+              181,
+              224,
+              185,
+              129,
+              224,
+              184,
+              163,
+              224,
+              184,
+              129,
+              32,
+              50,
+              48,
+              50,
+              54,
+              32,
+              40,
+              85,
+              112,
+              100,
+              97,
+              116,
+              101,
+              100,
+              32,
+              102,
+              114,
+              111,
+              109,
+              32,
+              80,
+              111,
+              115,
+              116,
+              109,
+              97,
+              110,
+              41,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              114,
+              116,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              48,
+              49,
+              45,
+              48,
+              49,
+              84,
+              48,
+              48,
+              58,
+              48,
+              48,
+              58,
+              48,
+              48,
+              46,
+              48,
+              48,
+              48,
+              90,
+              34,
+              44,
+              34,
+              101,
+              110,
+              100,
+              65,
+              116,
+              34,
+              58,
+              34,
+              50,
+              48,
+              50,
+              54,
+              45,
+              48,
+              54,
+              45,
+              51,
+              48,
+              84,
+              50,
+              51,
+              58,
+              53,
+              57,
+              58,
+              53,
+              57,
+              46,
+              48,
+              48,
+              48,
+              90,
+              34,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              34,
+              79,
+              80,
+              69,
+              78,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 203,
+          "responseSize": 234
+        },
+        "id": "6c69ce17-bf3f-48d5-9122-5795f3d11b6f"
+      }
+    ],
+    "transfers": {
+      "responseTotal": 991
+    },
+    "failures": [],
+    "error": null
+  }
+}

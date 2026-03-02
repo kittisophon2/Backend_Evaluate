@@ -49,31 +49,41 @@ export const list = async (req, res, next) => {
 //
 export const create = async (req, res, next) => {
     try {
-        const { periodId, departmentId, evaluatorId, evaluateeId } = req.body;
+        // 1. เพิ่มการรับค่า name มาจาก req.body
+        const { periodId, departmentId, evaluatorId, evaluateeId, name } = req.body;
 
-        if (!periodId || !departmentId || !evaluatorId || !evaluateeId) {
+        // 2. เช็คข้อมูลให้ครอบคลุมถึง name
+        if (!periodId || !departmentId || !evaluatorId || !evaluateeId || !name) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
-        // ใช้ transaction เพื่อกันข้อมูลครึ่ง ๆ กลาง ๆ
+        // 3. ดึงข้อมูล Period เพื่อเอา startDate/endDate
+        const period = await prisma.period.findUnique({ where: { id: periodId } });
+        if (!period) {
+            return res.status(404).json({ message: 'Period not found' });
+        }
+
+        // ใช้ transaction เพื่อสร้างข้อมูล
         const result = await prisma.$transaction(async (tx) => {
-            // Prisma จะ throw error ถ้า duplicate (เพราะ @@unique)
+
+            // 4. สร้าง Evaluation ก่อน เพราะใน Schema Assignment อ้างอิงถึง Evaluation
+            const evaluation = await tx.evaluation.create({
+                data: {
+                    name: name,
+                    startDate: period.startDate || new Date(),
+                    endDate: period.endDate || new Date(),
+                    createdBy: req.user.id // ดึงจาก auth middleware
+                }
+            });
+
+            // 5. สร้าง Assignment โดยเชื่อมกับ evaluation.id ที่เพิ่งสร้าง
             const assignment = await tx.assignment.create({
                 data: {
                     periodId,
                     departmentId,
                     evaluatorId,
-                    evaluateeId
-                }
-            });
-
-            const evaluation = await tx.evaluation.create({
-                data: {
-                    assignmentId: assignment.id,
-                    periodId: assignment.periodId,
-                    evaluatorId: assignment.evaluatorId,
-                    evaluateeId: assignment.evaluateeId,
-                    departmentId: assignment.departmentId
+                    evaluateeId,
+                    evaluationId: evaluation.id
                 }
             });
 

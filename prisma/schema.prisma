@@ -1,3 +1,9 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,138 +13,105 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String      @unique
+  passwordHash String
+  role         Role
+  departmentId String?     @db.ObjectId
+  department   Department? @relation(fields: [departmentId], references: [id])
+  createdAt    DateTime    @default(now())
+
+  // เพิ่ม Relation ฝั่งตรงข้ามที่อ้างอิงมาจาก Assignment
+  evaluatorAssignments Assignment[] @relation("Evaluator")
+  evaluateeAssignments Assignment[] @relation("Evaluatee")
+}
+
 model Department {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
 
-  users       User[]
-  assignments Assignment[] // ✅ เพิ่ม Relation
-}
-
-model User {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  empId        String   @unique
-  name         String
-  departmentId String   @db.ObjectId
-  role         String
-  email        String   @unique
-  password     String
-  createdAt    DateTime @default(now())
-
-  department Department @relation(fields: [departmentId], references: [id])
-
-  createdEvaluations Evaluation[] @relation("EvaluationCreator")
-  createdTopics      Topic[]      @relation("TopicCreator")
-
-  evaluatorAssignments Assignment[] @relation("Evaluator")
-  evaluateeAssignments Assignment[] @relation("Evaluatee")
-
-  evidences IndicatorEvidence[]
-}
-
-// ✅ 1. เพิ่มโมเดล Period (รอบการประเมิน)
-model Period {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String?
-  startDate DateTime?
-  endDate   DateTime?
-  status    String   @default("OPEN") 
-  createdAt DateTime @default(now())
-
-  assignments Assignment[]
+  // เพิ่ม Relation ฝั่งตรงข้ามที่อ้างอิงมาจาก User
+  users User[]
 }
 
 model Evaluation {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  startDate DateTime
-  endDate   DateTime
-  createdBy String   @db.ObjectId
-  createdAt DateTime @default(now())
+  id      String           @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  startAt DateTime
+  endAt   DateTime
+  status  EvaluationStatus
+  topics  Topic[]
 
-  creator User @relation("EvaluationCreator", fields: [createdBy], references: [id])
-
-  topics      Topic[]
+  // เพิ่ม Relation ฝั่งตรงข้ามที่อ้างอิงมาจาก Assignment
   assignments Assignment[]
 }
 
 model Topic {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  evaluationId String   @db.ObjectId
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  evaluationId String      @db.ObjectId
   name         String
-  description  String
-  createdBy    String   @db.ObjectId
-  createdAt    DateTime @default(now())
-
-  evaluation Evaluation @relation(fields: [evaluationId], references: [id])
-  creator    User       @relation("TopicCreator", fields: [createdBy], references: [id])
-
-  indicators Indicator[]
+  evaluation   Evaluation  @relation(fields: [evaluationId], references: [id])
+  indicators   Indicator[]
 }
 
 model Indicator {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  topicId         String   @db.ObjectId
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  topicId         String        @db.ObjectId
   name            String
-  description     String
-  indicatorType   String
-  requireEvidence Boolean
+  type            IndicatorType
   weight          Float
-  createdAt       DateTime @default(now())
-
-  topic Topic @relation(fields: [topicId], references: [id])
-
-  results   IndicatorResult[]
-  evidences IndicatorEvidence[]
+  requireEvidence Boolean
+  topic           Topic         @relation(fields: [topicId], references: [id])
 }
 
 model Assignment {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  
-  // ✅ 2. เพิ่มฟิลด์ที่ Controller ต้องการใช้งาน
-  periodId     String   @db.ObjectId
-  departmentId String   @db.ObjectId
-  status       String   @default("DRAFT")
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  evaluationId String @db.ObjectId
+  evaluatorId  String @db.ObjectId
+  evaluateeId  String @db.ObjectId
 
-  // ปรับให้ evaluationId เป็น Optional (ใส่ ? ไว้) เพื่อให้สร้างได้แม้ยังไม่ผูกฟอร์ม
-  evaluationId String?  @db.ObjectId
-  
-  evaluatorId  String   @db.ObjectId
-  evaluateeId  String   @db.ObjectId
-  createdAt    DateTime @default(now())
+  evaluation Evaluation @relation(fields: [evaluationId], references: [id])
+  evaluator  User       @relation("Evaluator", fields: [evaluatorId], references: [id])
+  evaluatee  User       @relation("Evaluatee", fields: [evaluateeId], references: [id])
 
-  // ✅ 3. เชื่อม Relation ให้สมบูรณ์
-  period       Period     @relation(fields: [periodId], references: [id])
-  department   Department @relation(fields: [departmentId], references: [id])
-  evaluation   Evaluation? @relation(fields: [evaluationId], references: [id])
-
-  evaluator User @relation("Evaluator", fields: [evaluatorId], references: [id])
-  evaluatee User @relation("Evaluatee", fields: [evaluateeId], references: [id])
-
-  indicatorResults IndicatorResult[]
-
-  // ✅ 4. ป้องกันการจ่ายงานซ้ำ (ผู้ประเมินคนเดิม ประเมินคนถูกประเมินคนเดิม ในรอบเดียวกัน)
-  @@unique([periodId, evaluatorId, evaluateeId])
+  @@unique([evaluationId, evaluatorId, evaluateeId])
 }
 
-model IndicatorResult {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  indicatorId  String   @db.ObjectId
-  assignmentId String   @db.ObjectId
-  score        Int
-  createdAt    DateTime @default(now())
-
-  indicator  Indicator  @relation(fields: [indicatorId], references: [id])
-  assignment Assignment @relation(fields: [assignmentId], references: [id])
-}
-
-model IndicatorEvidence {
+model Evidence {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   indicatorId String   @db.ObjectId
   evaluateeId String   @db.ObjectId
-  filename    String
+  filePath    String
+  mimeType    String
+  sizeBytes   Int
   createdAt   DateTime @default(now())
 
-  indicator Indicator @relation(fields: [indicatorId], references: [id])
-  evaluatee User      @relation(fields: [evaluateeId], references: [id])
+  @@unique([indicatorId, evaluateeId])
+}
+
+model EvaluationResult {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  assignmentId String   @db.ObjectId
+  indicatorId  String   @db.ObjectId
+  score        Int? // 1–4 or 0/1
+  createdAt    DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  EVALUATOR
+  EVALUATEE
+}
+
+enum IndicatorType {
+  SCALE_1_4
+  YES_NO
+}
+
+enum EvaluationStatus {
+  DRAFT
+  OPEN
+  CLOSED
 }
