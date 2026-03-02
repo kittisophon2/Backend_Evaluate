@@ -25,6 +25,8 @@ router.post('/topics', topics.create);
 router.patch('/topics/:id', topics.update);
 router.delete('/topics/:id', topics.remove);
 
+router.get('/indicators', indicators.listAll);
+router.get('/topics/:topicId/indicators', indicators.list);
 router.post('/topics/:topicId/indicators', indicators.create);
 router.patch('/topics/:topicId/indicators/:indicatorId', indicators.update);
 router.delete('/topics/:topicId/indicators/:indicatorId', indicators.remove);

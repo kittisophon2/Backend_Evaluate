@@ -1,6 +1,53 @@
 import prisma from '../../prisma/client.js';
 
 //
+// GET /admin/indicators
+//
+export const listAll = async (req, res, next) => {
+    try {
+        const {
+            q = '',
+            page = 1,
+            pageSize = 10,
+            sort = 'name:asc',
+            topicId
+        } = req.query;
+
+        const [sortField, sortOrder] = sort.split(':');
+        const skip = (Number(page) - 1) * Number(pageSize);
+
+        const where = {
+            AND: [
+                q ? { name: { contains: q } } : {},
+                topicId ? { topicId } : {}
+            ]
+        };
+
+        const [data, total] = await Promise.all([
+            prisma.indicator.findMany({
+                where,
+                skip,
+                take: Number(pageSize),
+                orderBy: { [sortField]: sortOrder },
+                include: {
+                    topic: {
+                        select: { name: true }
+                    }
+                }
+            }),
+            prisma.indicator.count({ where })
+        ]);
+
+        res.json({
+            data,
+            meta: { total, page: Number(page), pageSize: Number(pageSize) }
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+//
 // GET /admin/topics/:topicId/indicators
 //
 export const list = async (req, res, next) => {
@@ -10,7 +57,7 @@ export const list = async (req, res, next) => {
             q = '',
             page = 1,
             pageSize = 10,
-            sort = 'createdAt:asc'
+            sort = 'name:asc'
         } = req.query;
 
         const [sortField, sortOrder] = sort.split(':');
@@ -50,13 +97,15 @@ export const create = async (req, res, next) => {
         const topicId = req.params.topicId;
         const {
             name,
-            description,
+            type,
             indicatorType,
             requireEvidence = false,
             weight
         } = req.body;
 
-        if (!name || !description || !indicatorType || weight === undefined) {
+        const resolvedType = type || indicatorType;
+
+        if (!name || !resolvedType || weight === undefined) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
@@ -72,8 +121,7 @@ export const create = async (req, res, next) => {
             data: {
                 topicId,
                 name,
-                description,
-                indicatorType,
+                type: resolvedType,
                 requireEvidence,
                 weight: Number(weight)
             }
@@ -93,7 +141,7 @@ export const update = async (req, res, next) => {
         const indicatorId = req.params.indicatorId;
         const {
             name,
-            description,
+            type,
             indicatorType,
             requireEvidence,
             weight
@@ -107,12 +155,13 @@ export const update = async (req, res, next) => {
             return res.status(404).json({ message: 'Indicator not found' });
         }
 
+        const resolvedType = type || indicatorType;
+
         const updated = await prisma.indicator.update({
             where: { id: indicatorId },
             data: {
                 name,
-                description,
-                indicatorType,
+                type: resolvedType,
                 requireEvidence,
                 weight: weight !== undefined ? Number(weight) : undefined
             }
